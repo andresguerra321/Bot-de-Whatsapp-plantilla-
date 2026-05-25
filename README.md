@@ -1,10 +1,10 @@
-# 🤖 WA-Bot — Agente de Ventas por WhatsApp
+# WA-Bot — Agente de Ventas por WhatsApp
 
 Bot de WhatsApp con IA conversacional construido con **Baileys** y **Node.js**. Sin intermediarios, sin mensualidades por API, 100% tuyo.
 
 ---
 
-## ✨ Características
+## Características
 
 - Conexión directa a WhatsApp vía Baileys (sin Twilio ni servicios de pago)
 - IA conversacional con historial por usuario (Groq + LLaMA 3.1)
@@ -17,7 +17,7 @@ Bot de WhatsApp con IA conversacional construido con **Baileys** y **Node.js**. 
 
 ---
 
-## 🗂️ Estructura del proyecto
+## Estructura del proyecto
 
 ```
 wa-bot/
@@ -50,7 +50,7 @@ wa-bot/
 
 ---
 
-## 🚀 Instalación local
+## Instalación local
 
 ### Requisitos
 
@@ -82,7 +82,7 @@ La primera vez aparece un QR en la terminal. Escanéalo desde **WhatsApp > Dispo
 
 ---
 
-## 🐳 Instalación con Docker
+## Instalación con Docker
 
 ```bash
 # Build y arranque
@@ -100,7 +100,7 @@ docker compose down
 
 ---
 
-## ⚙️ Variables de entorno
+## Variables de entorno
 
 Crea un archivo `.env` en la raíz con:
 
@@ -112,7 +112,7 @@ GROQ_API_KEY=gsk_xxxxxxxxxxxxxxxxx
 
 ---
 
-## 📦 Comandos disponibles
+## Comandos disponibles
 
 | Comando | Descripción |
 |---|---|
@@ -125,7 +125,7 @@ Cualquier mensaje sin comando va directo a la IA.
 
 ---
 
-## 🧠 Personalización
+## Personalización
 
 Para adaptar el bot a otra marca edita únicamente `src/datos/catalogo.js`:
 
@@ -149,7 +149,7 @@ El prompt de la IA se construye automáticamente desde ese archivo.
 
 ---
 
-## 🌐 Deploy en Railway
+## Deploy en Railway
 
 1. Sube el proyecto a GitHub (sin `.env` ni `data/sesion/`)
 2. Crea un nuevo proyecto en [Railway](https://railway.app)
@@ -160,7 +160,7 @@ El prompt de la IA se construye automáticamente desde ese archivo.
 
 ---
 
-## 🛠️ Stack
+## Stack
 
 - [Baileys](https://github.com/WhiskeySockets/Baileys) — WhatsApp Web API
 - [Groq](https://console.groq.com) — Inferencia LLM ultrarrápida
@@ -170,13 +170,13 @@ El prompt de la IA se construye automáticamente desde ese archivo.
 
 ---
 
-## 👤 Autor
+## Autor
 
 **Andrés Felipe Guerra Correa (Pipe)**
 GitHub: [@andresguerra321](https://github.com/andresguerra321)
 
 ---
 
-## 📄 Licencia
+## Licencia
 
 MIT
