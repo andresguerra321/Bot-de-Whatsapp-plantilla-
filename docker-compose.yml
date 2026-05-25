@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  wa-bot:
+    build: .
+    container_name: wa-bot
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./data/sesion:/app/data/sesion
+    stdin_open: true
+    tty: true
