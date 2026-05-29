@@ -1,3 +1,12 @@
+---
+title: WA Bot
+emoji: 🤖
+colorFrom: green
+colorTo: blue
+sdk: docker
+pinned: false
+---
+
 # WA-Bot — Agente de Ventas por WhatsApp
 
 Bot de WhatsApp con IA conversacional construido con **Baileys** y **Node.js**. Sin intermediarios, sin mensualidades por API, 100% tuyo.
