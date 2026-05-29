@@ -34,10 +34,11 @@ const { state, saveCreds } = await useMultiFileAuthState(ruta)
 
   sock.ev.on('connection.update', async ({ connection, lastDisconnect, qr }) => {
     if (qr) {
-      console.log('Escanea este QR:')
-      const { default: qrcode } = await import('qrcode-terminal')
-      qrcode.generate(qr, { small: true })
-    }
+      console.log('QR generado, guardando como imagen...')
+      const QRCode = await import('qrcode')
+      await QRCode.default.toFile('./data/qr.png', qr)
+      console.log('QR guardado en data/qr.png — descárgalo y escanéalo')
+}
 
     if (connection === 'close') {
       const codigo = new Boom(lastDisconnect?.error)?.output?.statusCode
