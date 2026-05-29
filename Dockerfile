@@ -1,19 +1,16 @@
 FROM node:20-alpine
 
-# directorio de trabajo dentro del contenedor
 WORKDIR /app
 
-# copia primero los archivos de dependencias
-COPY package*.json ./
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
-# instala dependencias
+COPY package*.json ./
 RUN npm install --production
 
-# copia el resto del código
 COPY . .
 
-# crea la carpeta de sesión si no existe
-RUN mkdir -p data/sesion
+RUN mkdir -p /data/sesion && chown -R appuser:appgroup /app /data
 
-# arranca el bot
+USER appuser
+
 CMD ["node", "src/bot.js"]

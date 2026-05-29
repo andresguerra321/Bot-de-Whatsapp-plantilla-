@@ -12,7 +12,8 @@ dotenv.config()
 
 async function iniciarBot() {
   console.log('1. Cargando estado de sesión...')
-  const { state, saveCreds } = await useMultiFileAuthState('./data/sesion')
+const ruta = process.env.HF_SPACE === 'true' ? '/data/sesion' : './data/sesion'
+const { state, saveCreds } = await useMultiFileAuthState(ruta)
 
   console.log('2. Obteniendo versión de Baileys...')
   const { version } = await fetchLatestBaileysVersion()
