@@ -36,8 +36,9 @@ const { state, saveCreds } = await useMultiFileAuthState(ruta)
     if (qr) {
       console.log('QR generado, guardando como imagen...')
       const QRCode = await import('qrcode')
-      await QRCode.default.toFile('./data/qr.png', qr)
-      console.log('QR guardado en data/qr.png — descárgalo y escanéalo')
+      const ruta = process.env.HF_SPACE === 'true' ? '/data/qr.png' : './data/qr.png'
+      await QRCode.default.toFile(ruta, qr)
+      console.log('QR guardado en', ruta, '— descárgalo y escanéalo')
 }
 
     if (connection === 'close') {
