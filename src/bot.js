@@ -29,7 +29,17 @@ app.get('/', (req, res) => {
   `)
 })
 app.listen(7860, () => console.log('Servidor QR corriendo en puerto 7860'))
-
+  if (process.env.HF_SPACE === 'true') {
+  const SPACE_URL = process.env.SPACE_URL || 'https://papiguerra-wa-bot.hf.space'
+  setInterval(async () => {
+    try {
+      await fetch(SPACE_URL)
+      console.log('Keep-alive ping enviado')
+    } catch (e) {
+      console.log('Keep-alive falló:', e.message)
+    }
+  }, 25 * 1000) // cada 25 segundos
+}
 async function iniciarBot() {
   console.log('1. Cargando estado de sesión...')
   const ruta = process.env.HF_SPACE === 'true' ? '/data/sesion' : './data/sesion'
