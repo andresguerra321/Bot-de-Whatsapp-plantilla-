@@ -34,11 +34,9 @@ const { state, saveCreds } = await useMultiFileAuthState(ruta)
 
   sock.ev.on('connection.update', async ({ connection, lastDisconnect, qr }) => {
     if (qr) {
-      console.log('QR generado, guardando como imagen...')
       const QRCode = await import('qrcode')
-      const ruta = process.env.HF_SPACE === 'true' ? '/data/qr.png' : './data/qr.png'
-      await QRCode.default.toFile(ruta, qr)
-      console.log('QR guardado en', ruta, '— descárgalo y escanéalo')
+      qrActual = await QRCode.default.toDataURL(qr)
+      console.log('QR listo en la URL del Space')
 }
 
     if (connection === 'close') {
