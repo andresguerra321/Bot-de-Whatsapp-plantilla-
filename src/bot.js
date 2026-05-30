@@ -12,34 +12,66 @@ import { manejarMensaje } from './handlers/mensajes.js'
 dotenv.config()
 
 let qrActual = null
+let botConectado = false // Control extra para el Health Check
 
 const app = express()
+
+// Ruta principal optimizada para pasar los Health Checks de Hugging Face
 app.get('/', (req, res) => {
-  if (!qrActual) {
-    res.send('<html><body style="background:#111;color:white;display:flex;justify-content:center;align-items:center;height:100vh;font-family:sans-serif"><h2>QR no disponible aún, recarga en unos segundos...</h2></body></html>')
+  // Caso 1: El bot ya está enlazado y respondiendo mensajes
+  if (botConectado) {
+    res.status(200).send(`
+      <html>
+        <body style="background:#111;color:#00ff88;display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh;font-family:sans-serif">
+          <h2 style="margin-bottom:10px;">🚀 WA-Bot está En Línea</h2>
+          <p style="color:#aaa;">Conectado exitosamente y procesando mensajes con Groq.</p>
+        </body>
+      </html>
+    `)
     return
   }
-  res.send(`
+
+  // Caso 2: El QR está listo para ser escaneado
+  if (qrActual) {
+    res.status(200).send(`
+      <html>
+        <body style="background:#111;display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh;font-family:sans-serif">
+          <h2 style="color:white;margin-bottom:20px;">Escanea este QR con WhatsApp</h2>
+          <img src="${qrActual}" style="width:300px;height:300px;border-radius:10px;box-shadow: 0px 4px 20px rgba(255,255,255,0.1);"/>
+        </body>
+      </html>
+    `)
+    return
+  }
+
+  // Caso 3: Iniciando el contenedor, esperando el primer QR
+  res.status(200).send(`
     <html>
-      <body style="background:#111;display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh">
-        <h2 style="color:white;font-family:sans-serif">Escanea este QR con WhatsApp</h2>
-        <img src="${qrActual}" style="width:300px;height:300px"/>
+      <body style="background:#111;color:white;display:flex;justify-content:center;align-items:center;height:100vh;font-family:sans-serif">
+        <h2>Iniciando el bot, genera el QR en unos segundos... Reintentando automáticamente.</h2>
+        <script>setTimeout(() => { location.reload(); }, 3000);</script>
       </body>
     </html>
   `)
 })
-app.listen(7860, () => console.log('Servidor QR corriendo en puerto 7860'))
-  if (process.env.HF_SPACE === 'true') {
+
+// Escuchar en el puerto requerido por HF
+app.listen(7860, () => console.log('Servidor HTTP corriendo en puerto 7860'))
+
+// Keep-alive optimizado
+if (process.env.HF_SPACE === 'true') {
   const SPACE_URL = process.env.SPACE_URL || 'https://papiguerra-wa-bot.hf.space'
   setInterval(async () => {
     try {
-      await fetch(SPACE_URL)
-      console.log('Keep-alive ping enviado')
+      // Usamos un método HEAD para no sobrecargar el servidor web con HTML
+      await fetch(SPACE_URL, { method: 'HEAD' })
+      console.log('Keep-alive ping enviado con éxito')
     } catch (e) {
-      console.log('Keep-alive falló:', e.message)
+      console.log('Keep-alive falló (silencioso):', e.message)
     }
-  }, 25 * 1000) // cada 25 segundos
+  }, 25 * 1000) 
 }
+
 async function iniciarBot() {
   console.log('1. Cargando estado de sesión...')
   const ruta = process.env.HF_SPACE === 'true' ? '/data/sesion' : './data/sesion'
@@ -64,12 +96,15 @@ async function iniciarBot() {
 
   sock.ev.on('connection.update', async ({ connection, lastDisconnect, qr }) => {
     if (qr) {
+      botConectado = false
       const QRCode = await import('qrcode')
       qrActual = await QRCode.default.toDataURL(qr)
       console.log('QR listo — abre la URL del Space para escanearlo')
     }
 
     if (connection === 'close') {
+      botConectado = false
+      qrActual = null
       const codigo = new Boom(lastDisconnect?.error)?.output?.statusCode
       const debeReconectar = codigo !== DisconnectReason.loggedOut
       console.log('Conexión cerrada. Código:', codigo)
@@ -84,6 +119,7 @@ async function iniciarBot() {
 
     if (connection === 'open') {
       qrActual = null
+      botConectado = true // El health check ahora devolverá el aviso de éxito
       console.log('Bot conectado')
     }
   })
