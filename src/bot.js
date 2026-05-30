@@ -6,14 +6,34 @@ import makeWASocket, {
 import { Boom } from '@hapi/boom'
 import pino from 'pino'
 import dotenv from 'dotenv'
+import express from 'express'
 import { manejarMensaje } from './handlers/mensajes.js'
 
 dotenv.config()
 
+let qrActual = null
+
+const app = express()
+app.get('/', (req, res) => {
+  if (!qrActual) {
+    res.send('<html><body style="background:#111;color:white;display:flex;justify-content:center;align-items:center;height:100vh;font-family:sans-serif"><h2>QR no disponible aún, recarga en unos segundos...</h2></body></html>')
+    return
+  }
+  res.send(`
+    <html>
+      <body style="background:#111;display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh">
+        <h2 style="color:white;font-family:sans-serif">Escanea este QR con WhatsApp</h2>
+        <img src="${qrActual}" style="width:300px;height:300px"/>
+      </body>
+    </html>
+  `)
+})
+app.listen(7860, () => console.log('Servidor QR corriendo en puerto 7860'))
+
 async function iniciarBot() {
   console.log('1. Cargando estado de sesión...')
-const ruta = process.env.HF_SPACE === 'true' ? '/data/sesion' : './data/sesion'
-const { state, saveCreds } = await useMultiFileAuthState(ruta)
+  const ruta = process.env.HF_SPACE === 'true' ? '/data/sesion' : './data/sesion'
+  const { state, saveCreds } = await useMultiFileAuthState(ruta)
 
   console.log('2. Obteniendo versión de Baileys...')
   const { version } = await fetchLatestBaileysVersion()
@@ -24,7 +44,7 @@ const { state, saveCreds } = await useMultiFileAuthState(ruta)
     version,
     auth: state,
     logger: pino({ level: 'silent' }),
-    printQRInTerminal: true,
+    printQRInTerminal: false,
     browser: ['WaBot', 'Chrome', '1.0.0']
   })
 
@@ -36,8 +56,8 @@ const { state, saveCreds } = await useMultiFileAuthState(ruta)
     if (qr) {
       const QRCode = await import('qrcode')
       qrActual = await QRCode.default.toDataURL(qr)
-      console.log('QR listo en la URL del Space')
-}
+      console.log('QR listo — abre la URL del Space para escanearlo')
+    }
 
     if (connection === 'close') {
       const codigo = new Boom(lastDisconnect?.error)?.output?.statusCode
@@ -53,6 +73,7 @@ const { state, saveCreds } = await useMultiFileAuthState(ruta)
     }
 
     if (connection === 'open') {
+      qrActual = null
       console.log('Bot conectado')
     }
   })
